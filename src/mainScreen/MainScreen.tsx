@@ -1,6 +1,6 @@
 import React from 'react'
 
-function SignUpScreen (): React.JSX.Element {
+function MainScreen (): React.JSX.Element {
   return (
         <div>
 
@@ -8,4 +8,4 @@ function SignUpScreen (): React.JSX.Element {
   )
 }
 
-export default SignUpScreen
+export default MainScreen
