@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input } from '@mui/material'
@@ -15,6 +15,13 @@ function SignUpScreen (): React.JSX.Element {
     pw: ''
   })
   const navi = useNavigate()
+  useEffect(() => {
+    fetch('http://localhost:8080/api', {
+      method: 'get',
+      headers: { 'content-type': 'application/json' }
+    }).then((res) => { console.log(res.json()) })
+      .catch((e) => { alert(e) })
+  })
   const onChangeInputValue = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
     setUserForm({ ...userForm, [event.target.name]: event.target.value })
   }
