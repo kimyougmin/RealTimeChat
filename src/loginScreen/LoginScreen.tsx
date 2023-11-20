@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import useCookie from 'react-use-cookie'
 import { useNavigate } from 'react-router-dom'
+import { useCookies } from 'react-cookie'
 
 interface userForm {
   userName: string
@@ -11,8 +11,9 @@ function LoginScreen (): React.JSX.Element {
     userName: '',
     userPw: ''
   })
-  const [, setCookies] = useCookie('userData')
+  const [, setCookies] = useCookies()
   const navi = useNavigate()
+
   const onChangeInputValue = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setUserForm({ ...userFrom, [event.target.name]: event.target.value })
   }
@@ -23,9 +24,10 @@ function LoginScreen (): React.JSX.Element {
       body: JSON.stringify({ name: userFrom.userName, password: userFrom.userPw })
     }).then(async (res) => {
       const data = await res.json()
-      setCookies(data)
-      console.log(data)
-      navi('/')
+      setCookies('userData', { uuid: data[0].id, name: data[0].name }, {
+        path: '/'
+      })
+      navi('/mainScreen')
     }).catch(() => {
       alert('로그인 실패!')
     })

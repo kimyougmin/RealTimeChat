@@ -1,7 +1,7 @@
 .mainScreen{
     margin: 15% 25% 15% 25%;
     height: 70%;
-    width: 50%;
+    width: 60%;
     display: flex;
     background-color: red;
 }
@@ -10,4 +10,13 @@
     height: 100%;
     width: 60%;
     background-color: #61dafb;
+}
+.conversationArea > .messagePrintArea{
+    background-color: grey;
+    height: 80%;
+    width: 100%;
+}
+.conversationArea > .dataInputArea{
+    height: 20%;
+    width: 100%;
 }
