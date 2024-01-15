@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const {pool} = require("./lib/dbconfig");
+const { pool } = require("./lib/dbconfig");
 const bodyParser = require('body-parser');
 const Timer = require("./lib/Timer");
 const http = require('http');
@@ -53,14 +53,14 @@ app.post('/api/send', async  (req, res) => {
     pool.query(`select * from header where (from_id='${body.uuid}' and to_id='${body.userUuid}') or (to_id='${body.uuid}' and from_id='${body.userUuid}')`)
         .then(async ([rows]) => {
             console.log('rows values=',rows)
-            if (rows[0].id === undefined) { // 첫 메세지 전송 시
+            if (rows[0] === undefined) { // 첫 메세지 전송 시
                 console.log('처음 대화하는 상대방 쿼리가 실행 됨', `insert into header(id, from_id, to_id, subject, status) values('${v4()}', '${body.uuid}', '${body.userUuid}', '${body.message}', '${body.uuid}')\n`);
                 pool.query(`insert into header(id, from_id, to_id, subject, status) values('${v4()}', '${body.uuid}', '${body.userUuid}', '${body.message}', '${body.uuid}')`)
                     .then(async () => {
                         await pool.query(`select id, from_id from header where from_id='${body.uuid}' and to_id='${body.userUuid}'`)
                             .then(async ([rows]) => {
-                                console.log('마지막 쿼리 실행', `insert into message(id, header_id, is_from_sender, content, read) values('${v4()}', '${rows[0].id}', ${body.from_id}, '${body.message}', ${1})`);
-                                await pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', ${1}, '${body.message}', ${1})`);
+                                console.log('마지막 쿼리 실행', `insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}', '${body.message}', ${1})`);
+                                await pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}', '${body.message}', ${1})`);
                                 res.send('ok');
                             }).catch((e) => {
                             console.log('error =>',e)
@@ -86,6 +86,17 @@ app.post('/api/send', async  (req, res) => {
             // } catch (e) {
             //     await connection.rollback();
             // }
+        })
+})
+app.post('/api/charRoom', async (req, res) => {
+    const body = req.body;
+    console.log(body)
+    pool.query(`select h.id, from_id, to_id, subject, time, (select name from user where user.id = to_id) from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, time, (select name from user where user.id = from_id) from hea
+der h where to_id='${body.uuid}' order by time;`)
+        .then(async ([rows]) => {
+            const body = await rows
+            console.log(body)
+            res.send(body)
         })
 })
 // app.post('/api/selectChat', async  (req, res) => {
@@ -119,16 +130,14 @@ io.on('connection', function(socket) {
                 const data = await rows
                 setTimeout(() => {
                     socket.emit('selectData', data)
-                }, 1000)
+                }, 5000)
             }).catch((e) => {
             console.log('조회 오류',e)
         })
     })
-    // socket.on('connect', (data) => {
-    //     console.log('received: "' + data + '" from client' + socket.id);
-    //     socket.emit('test', "Ok, i got it, " + socket.id);
-    // });
-
+    socket.on('connect', (data) => {
+        console.log(data)
+    })
     socket.on('disconnect', () => {
         console.log('disconnected from ', socket.id);
     });
