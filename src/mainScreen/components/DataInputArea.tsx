@@ -31,6 +31,7 @@ function DataInputArea (): React.JSX.Element {
         userUuid: cookies.chatUser.userUuid,
         message: text
       }
+      console.log('sendFormat', sendFormat)
       fetch('http://localhost:8080/api/send', {
         method: 'post',
         headers: { 'content-type': 'application/json' },

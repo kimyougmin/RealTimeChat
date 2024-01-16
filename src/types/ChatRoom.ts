@@ -2,8 +2,8 @@ import { type ChatRoomMember } from './ChatRoomMember'
 
 export interface ChatRoom {
   roomUuid: string
-  createdAt: number
-  members: ChatRoomMember[]
+  createdAt: string
+  members: ChatRoomMember
   lastMessage: string
 }
 

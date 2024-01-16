@@ -27,6 +27,7 @@ function LoginScreen (): React.JSX.Element {
       setCookies('userData', { uuid: data[0].id, name: data[0].name }, {
         path: '/'
       })
+      setCookies('chatUser', '')
       navi('/mainScreen')
     }).catch(() => {
       alert('로그인 실패!')

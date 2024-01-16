@@ -48,7 +48,6 @@ app.post('/api/follow', async  (req, res) => {
 })
 app.post('/api/send', async  (req, res) => {
     const body = req.body
-    let is_from_sender = 0
 
     pool.query(`select * from header where (from_id='${body.uuid}' and to_id='${body.userUuid}') or (to_id='${body.uuid}' and from_id='${body.userUuid}')`)
         .then(async ([rows]) => {
@@ -67,9 +66,8 @@ app.post('/api/send', async  (req, res) => {
                         })
                     });
             } else { // 첫 메시지가 아닐 때
-                rows[0].from_id === body.uuid ? is_from_sender = body.uuid : body.userUuid
-                console.log('대화 중인 상대방 다음 쿼리 실행',`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${is_from_sender}','${body.message}', ${1})`)
-                pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${is_from_sender}','${body.message}', ${1})`)
+                console.log('대화 중인 상대방 다음 쿼리 실행',`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}','${body.message}', ${1})`)
+                pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}','${body.message}', ${1})`)
                 console.log('다음 퀴리 실행',`update header set subject='${body.message}', status='${body.uuid}' where id='${rows[0].id}'`)
                 pool.query(`update header set subject='${body.message}', status='${body.uuid}' where id='${rows[0].id}'`)
                     .then(async ([rows]) => {
@@ -91,8 +89,7 @@ app.post('/api/send', async  (req, res) => {
 app.post('/api/charRoom', async (req, res) => {
     const body = req.body;
     console.log(body)
-    pool.query(`select h.id, from_id, to_id, subject, time, (select name from user where user.id = to_id) from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, time, (select name from user where user.id = from_id) from hea
-der h where to_id='${body.uuid}' order by time;`)
+    pool.query(`select h.id, from_id, to_id, subject, time, (select name from user where user.id = to_id) name from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, time, (select name from user where user.id = from_id) from header h where to_id='${body.uuid}' order by time`)
         .then(async ([rows]) => {
             const body = await rows
             console.log(body)

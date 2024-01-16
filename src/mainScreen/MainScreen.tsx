@@ -1,5 +1,5 @@
-import React, { } from 'react'
-import ChatRoom from './components/ChatRoom'
+import React from 'react'
+import ChatRoomSet from './components/ChatRoomSet'
 import './MainScreen.css'
 import Chatting from './components/Chatting'
 
@@ -13,7 +13,7 @@ function MainScreen (): React.JSX.Element {
   // }, [cookies.userData])
   return (
     <div className={'mainScreen'}>
-      <ChatRoom />
+      <ChatRoomSet />
       <div className={'conversationArea'}>
         <Chatting />
       </div>
