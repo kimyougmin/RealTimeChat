@@ -15,17 +15,21 @@ function MessagePrintArea (): React.JSX.Element {
   useEffect(() => {
     onSocket()
   }, [cookies.chatUser.userUuid])
-  window.addEventListener('focus', (): void => {
-    const tempMessage = message.map((data, index) => {
-      return {
-        id: data.id,
-        content: data.content,
-        is_from_sender: data.is_from_sender,
-        read_status: 0,
-        time: data.time
-      }
-    })
-    setMessage(tempMessage)
+  window.addEventListener('focus', (): void | null => {
+    if (cookies.chatUser.userUuid === undefined) {
+      return null
+    }
+    console.log('포커스 이벤트 실행')
+    const chattingRoom: ChatUser = {
+      uuid: cookies.userData.uuid,
+      userUuid: cookies.chatUser.userUuid
+    }
+    fetch('http://localhost:8080/api/readMessage', {
+      method: 'post',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(chattingRoom)
+    }).then(async () => { console.log('읽음') })
+      .catch((e) => { alert(e) })
   })
   const onSocket = (): void | null => {
     if (cookies.chatUser.userUuid === undefined) {

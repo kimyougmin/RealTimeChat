@@ -96,6 +96,14 @@ app.post('/api/charRoom', async (req, res) => {
             res.send(body)
         })
 })
+app.post('/api/readMessage', async (req, res) => {
+    const body = req.body
+    console.log(body)
+    pool.query(`update message m set read_status = 0 where m.header_id = (select id from header where (from_id='${body.uuid}' and to_id='${body.userUuid}') or (to_id='${body.uuid}' and from_id='${body.userUuid}')) and is_from_sender != '${body.uuid}'`)
+        .then(() => {
+            res.send('ok')
+        })
+})
 // app.post('/api/selectChat', async  (req, res) => {
 //     const body = req.body;
 //     console.log(body)
