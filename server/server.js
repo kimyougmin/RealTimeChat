@@ -13,9 +13,10 @@ const io = new Server(server, {
     }
 });
 const { v4 } = require('uuid');
-const {header} = require("request/lib/hawk");
+const { header } = require("request/lib/hawk");
 // const connection = await  pool.getConnection(async  (conn) => conn);
 
+let msgV4 = v4()
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors({
@@ -46,45 +47,21 @@ app.post('/api/follow', async  (req, res) => {
         }).catch((err) => {console.log(err)})
     console.log(Timer.getCurrentTimeString(),`다음 쿼리가 실행되었습니다.\nselect id, name from user where id='${body.uuid}'`)
 })
+app.post('/api/addHeader', async (req, res) => {
+    const body = req.body
+    pool.query(`insert into header(id, from_id, to_id, subject, status) values('${v4()}', '${body.uuid}', '${body.userUuid}', '.', '${body.uuid}')`)
+})
 app.post('/api/send', async  (req, res) => {
     const body = req.body
-
-    pool.query(`select * from header where (from_id='${body.uuid}' and to_id='${body.userUuid}') or (to_id='${body.uuid}' and from_id='${body.userUuid}')`)
+    pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${msgV4}', '${body.roomUuid}', '${body.uuid}','${body.message}', ${1})`)
+    console.log('다음 퀴리 실행',`update header set subject='${body.message}', status='${body.uuid}' where id='$body.roomUuid}'`)
+    pool.query(`update header set subject='${body.message}', status='${body.uuid}' where id='${body.roomUuid}'`)
         .then(async ([rows]) => {
-            console.log('rows values=',rows)
-            if (rows[0] === undefined) { // 첫 메세지 전송 시
-                console.log('처음 대화하는 상대방 쿼리가 실행 됨', `insert into header(id, from_id, to_id, subject, status) values('${v4()}', '${body.uuid}', '${body.userUuid}', '${body.message}', '${body.uuid}')\n`);
-                pool.query(`insert into header(id, from_id, to_id, subject, status) values('${v4()}', '${body.uuid}', '${body.userUuid}', '${body.message}', '${body.uuid}')`)
-                    .then(async () => {
-                        await pool.query(`select id, from_id from header where from_id='${body.uuid}' and to_id='${body.userUuid}'`)
-                            .then(async ([rows]) => {
-                                console.log('마지막 쿼리 실행', `insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}', '${body.message}', ${1})`);
-                                await pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}', '${body.message}', ${1})`);
-                                res.send('ok');
-                            }).catch((e) => {
-                            console.log('error =>',e)
-                        })
-                    });
-            } else { // 첫 메시지가 아닐 때
-                console.log('대화 중인 상대방 다음 쿼리 실행',`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}','${body.message}', ${1})`)
-                pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${v4()}', '${rows[0].id}', '${body.uuid}','${body.message}', ${1})`)
-                console.log('다음 퀴리 실행',`update header set subject='${body.message}', status='${body.uuid}' where id='${rows[0].id}'`)
-                pool.query(`update header set subject='${body.message}', status='${body.uuid}' where id='${rows[0].id}'`)
-                    .then(async ([rows]) => {
-                        await console.log('rows data => ', rows)
-                        res.send('ok');
-                    }).catch((e) => {
-                        console.log('error => ',e)
-                    })
-            }
-            // try {
-            //     await connection.beginTransaction();
-            //     pool.query('insert into message values()')
-            //     await connection.commit();
-            // } catch (e) {
-            //     await connection.rollback();
-            // }
-        })
+            await console.log('rows data => ', rows)
+            res.send('ok');
+        }).catch((e) => {
+        console.log('error => ',e)
+    })
 })
 app.post('/api/charRoom', async (req, res) => {
     const body = req.body;
@@ -99,28 +76,22 @@ app.post('/api/charRoom', async (req, res) => {
 app.post('/api/readMessage', async (req, res) => {
     const body = req.body
     console.log(body)
-    pool.query(`update message m set read_status = 0 where m.header_id = (select id from header where (from_id='${body.uuid}' and to_id='${body.userUuid}') or (to_id='${body.uuid}' and from_id='${body.userUuid}')) and is_from_sender != '${body.uuid}'`)
+    pool.query(`update message m set read_status = 0 where m.header_id = '${body.roomUuid}'`)
         .then(() => {
             res.send('ok')
         })
 })
-// app.post('/api/selectChat', async  (req, res) => {
-//     const body = req.body;
-//     console.log(body)
-//     pool.query(`select * from header where (from_id='${body.id}' and to_id='${body.userUuid}') or (to_id='${body.id}' and from_id='${body.userUuid}')`)
-//         .then(async ([rows]) => {
-//             console.log('헤더의 반환값', rows)
-//             await pool.query(`select * from message where read_status=${1} and header_id='${rows[0].id}' order by time`)
-//                 .then(async ([rows]) => {
-//                     await res.send(rows)
-//                     console.log('message return',rows)
-//                 }).catch((e) => {
-//                     console.log('안 쪽',e)
-//                 })
-//         }).catch((e) => {
-//             console.log(e)
-//         })
-// })
+app.post('/api/selectChat', async  (req, res) => {
+    const body = req.body;
+    console.log('selectChat body = ',body)
+    pool.query(`select id, content, is_from_sender as isFromSender, read_status as readStatus, time from message where header_id='${body.roomUuid}' order by time`)
+        .then(async ([rows]) => {
+            await res.send(rows)
+            console.log('message return', rows)
+        }).catch((e) => {
+            console.log('안 쪽',e)
+        })
+})
 
 server.listen(8080, (e) => {
     console.log('server running on 8080')
@@ -139,6 +110,21 @@ io.on('connection', function(socket) {
             }).catch((e) => {
             console.log('조회 오류',e)
         })
+    })
+    socket.on('msgSend', (data) => {
+        console.log('메시지 수신완료', data)
+        const newData = {
+            id: msgV4,
+            receiveUuid: data.userUuid,
+            transmit: data.uuid,
+            content: data.message,
+            isFromSender: data.uuid,
+            readStatus: 1,
+            time: data.createdAt
+        }
+        socket.broadcast.emit('msgBroadcast', newData)
+
+        msgV4 = v4();
     })
     socket.on('connect', (data) => {
         console.log(data)
