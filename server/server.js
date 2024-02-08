@@ -99,19 +99,8 @@ server.listen(8080, (e) => {
 io.on('connection', function(socket) {
     // Listen for test and disconnect events
     console.log('connected!')
-    socket.on('test' , (data) => {
-        console.log('chatRoomMember id', data)
-        pool.query(`select * from message, (select id from header where (from_id='${data.uuid}' and to_id='${data.userUuid}') or (to_id='${data.uuid}' and from_id='${data.userUuid}')) as header where header_id = header.id order by time`)
-            .then(async ([rows]) => {
-                const data = await rows
-                setTimeout(() => {
-                    socket.emit('selectData', data)
-                }, 5000)
-            }).catch((e) => {
-            console.log('조회 오류',e)
-        })
-    })
     socket.on('msgSend', (data) => {
+        msgV4 = v4();
         console.log('메시지 수신완료', data)
         const newData = {
             id: msgV4,
@@ -124,7 +113,6 @@ io.on('connection', function(socket) {
         }
         socket.broadcast.emit('msgBroadcast', newData)
 
-        msgV4 = v4();
     })
     socket.on('connect', (data) => {
         console.log(data)

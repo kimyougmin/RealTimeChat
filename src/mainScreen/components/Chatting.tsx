@@ -1,30 +1,47 @@
-import React, { type KeyboardEventHandler, useEffect, useState } from 'react'
+import React, { type KeyboardEventHandler, useCallback, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import TextField from '@mui/material/TextField'
-import './DataInputArea.css'
-import './MessagePrint.css'
+import './Chatting.css'
 import Box from '@mui/material/Box'
 import TimeStampAdapter from '../../components/TimeStampAdapter'
 import { io } from 'socket.io-client'
 import UiMessage from '../../components/UiMessage'
 import type MessageUi from '../../types/MessageUi'
 import { v4 } from 'uuid'
+import useInfiniteScrolling from '../../hooks/useInfiniteScrolling'
 
 function Chatting (): React.JSX.Element {
   const [text, setText] = useState('')
   const [cookies, setCookie] = useCookies(['userText', 'chatUser', 'chatRoomMember', 'userData'])
   const [message, setMessage] = useState<MessageUi[]>([])
+  const [observerRef, setObserverRef] = useState<null | HTMLDivElement>(null)
   const socket = io('http://localhost:8080/')
+
   useEffect(() => {
     if (cookies.userText !== undefined) {
       return () => {
         setCookie('userText', text)
       }
     }
-    selectChat()
     onSocket()
-    console.log(message)
   }, [cookies.chatUser])
+  const selectMessage = useCallback(() => {
+    fetch('http://localhost:8080/api/selectChat', {
+      method: 'post',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
+    }).then(async (res) => {
+      const data = await res.json()
+      setMessage(data)
+    }).catch((e) => {
+      console.log(e)
+    })
+  }, [message])
+  useInfiniteScrolling({
+    observerRef,
+    fetchMore: selectMessage,
+    hasMore: true
+  })
   window.addEventListener('focus', (): void | null => {
     if (cookies.chatUser.userUuid === undefined) {
       return null
@@ -33,32 +50,13 @@ function Chatting (): React.JSX.Element {
       method: 'post',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
-    }).then(async () => { selectChat() })
+    }).then(async () => { selectMessage() })
       .catch((e) => { alert(e) })
   })
-  const selectChat = (): void => {
-    console.log('cookies.chatUser.roomUuid = ', cookies.chatUser.roomUuid)
-    fetch('http://localhost:8080/api/selectChat', {
-      method: 'post',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
-    }).then(async (res) => {
-      const data = await res.json()
-      console.log('selectChat respons', data)
-      setMessage(data)
-    }).catch((e) => {
-      console.log(e)
-    })
-  }
   const onSocket = (): void | null => {
     if (cookies.chatUser.userUuid === undefined) {
-      console.log('null 반환됨')
       return null
     }
-    // const chattingRoom: ChatUser = {
-    //   uuid: cookies.userData.uuid,
-    //   userUuid: cookies.chatUser.userUuid
-    // }
     socket.on('msgBroadcast', (data) => {
       if (cookies.userData.uuid === data.receiveUuid) {
         const receiveData = {
@@ -117,24 +115,26 @@ function Chatting (): React.JSX.Element {
       }).catch(() => {
         console.log('전송 실패')
       })
+      setTimeout(() => {
+        console.log('setTimeOut')
+      }, 3000)
     }
   }
   return (
     <div>
       <div className={'messagePrint'}>
         {chatUser()}
-        <>
-          <div style={{ height: '52vh', backgroundColor: 'green' }}>
-            {message.map((data, index): React.JSX.Element => {
-              return <UiMessage id={data.id}
-                                content={data.content}
-                                isFromSender={data.isFromSender}
-                                readStatus={data.readStatus}
-                                time={data.time}
-                                key={index}/>
-            })}
-          </div>
-        </>
+        <div className={'messageBox'}>
+          {message.map((data, index): React.JSX.Element => {
+            return <UiMessage id={data.id}
+                              content={data.content}
+                              isFromSender={data.isFromSender}
+                              readStatus={data.readStatus}
+                              time={data.time}
+                              key={index}/>
+          })}
+          <div style={{ height: '10px', marginBottom: '20px', backgroundColor: 'red' }} ref={setObserverRef}></div>
+        </div>
       </div>
       <div className={'dataInputArea'}>
         <Box component="form"

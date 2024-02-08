@@ -16,7 +16,6 @@ function ChatRoomSet (): React.JSX.Element {
       body: JSON.stringify(cookies.userData)
     }).then(async (res) => {
       const data = await res.json()
-      console.log('data', data)
       data.forEach((e) => {
         if (e.from_id !== cookies.userData.uuid) {
           tempUuid = e.from_id
@@ -34,10 +33,7 @@ function ChatRoomSet (): React.JSX.Element {
           lastMessage: e.subject
         }]
       })
-
       setChatRoom(tempChatRoom)
-
-      console.log('tempChatRoom', tempChatRoom)
     }).catch((e) => {
       alert(e)
     })
