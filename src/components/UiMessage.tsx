@@ -6,7 +6,6 @@ import { useCookies } from 'react-cookie'
 const UiMessage: React.FC<MessageUi> = ({ id, content, isFromSender, readStatus, time }): React.JSX.Element => {
   const [cookies] = useCookies(['chatUser', 'chatRoomMember', 'userData'])
   const messageFlexRender = (): React.JSX.Element | null => {
-    console.log('messageFlexRender 시작')
     return isFromSender === cookies.userData.uuid
       ? (
         <div style={{ float: 'right', display: 'flex' }}>
