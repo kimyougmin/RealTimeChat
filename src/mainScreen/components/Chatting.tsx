@@ -25,6 +25,19 @@ function Chatting (): React.JSX.Element {
     }
     onSocket()
   }, [cookies.chatUser])
+
+  window.addEventListener('focus', (): void | null => {
+    if (cookies.chatUser.userUuid === undefined) {
+      return null
+    }
+    fetch('http://localhost:8080/api/readMessage', {
+      method: 'post',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
+    }).then(async () => { selectMessage() })
+      .catch((e) => { alert(e) })
+  })
+
   const selectMessage = useCallback(() => {
     fetch('http://localhost:8080/api/selectChat', {
       method: 'post',
@@ -42,17 +55,7 @@ function Chatting (): React.JSX.Element {
     fetchMore: selectMessage,
     hasMore: true
   })
-  window.addEventListener('focus', (): void | null => {
-    if (cookies.chatUser.userUuid === undefined) {
-      return null
-    }
-    fetch('http://localhost:8080/api/readMessage', {
-      method: 'post',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
-    }).then(async () => { selectMessage() })
-      .catch((e) => { alert(e) })
-  })
+
   const onSocket = (): void | null => {
     if (cookies.chatUser.userUuid === undefined) {
       return null
@@ -67,12 +70,14 @@ function Chatting (): React.JSX.Element {
           time: data.time
         }
         setMessage((e) => [...e, receiveData])
+        console.log('message', message)
       }
     })
     socket.on('disconnect', function () {
       console.log('disconnected..')
     })
   }
+
   const chatUser = (): React.JSX.Element => {
     return (
       <div className={'messagePrint_Header'}>
@@ -80,6 +85,7 @@ function Chatting (): React.JSX.Element {
       </div>
     )
   }
+
   const textInputHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     setText(e.target.value)
   }
@@ -98,6 +104,7 @@ function Chatting (): React.JSX.Element {
       }
       socket.emit('msgSend', sendFormat)
       setText('')
+      // 자신이 보낸 채팅을 추가하는 부분
       const myChat = {
         id: v4(),
         content: text,

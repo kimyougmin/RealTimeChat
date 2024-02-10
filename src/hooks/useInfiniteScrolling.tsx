@@ -19,7 +19,9 @@ const useInfiniteScrolling = ({ observerRef, fetchMore, hasMore }: Props): void 
       if (!entries[0].isIntersecting) return
 
       // "redux"를 쓴다면 () => { dispatch(/* */); } 형태로 사용
-      fetchMore()
+      setTimeout(() => {
+        fetchMore()
+      }, 10000)
     },
     [fetchMore]
   )
