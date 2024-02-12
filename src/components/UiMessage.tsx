@@ -9,8 +9,11 @@ const UiMessage: React.FC<MessageUi> = ({ id, content, isFromSender, readStatus,
     return isFromSender === cookies.userData.uuid
       ? (
         <div style={{ float: 'right', display: 'flex' }}>
-          {readStatus === 1 ? <p className={'read_status'}>{readStatus}</p> : null}
-          <div>
+          <div className={'messageStatus'}>
+            {readStatus === 1 ? <p className={'read_status'}>{readStatus}</p> : null}
+            <p className={'messageTime'}>{time}</p>
+          </div>
+          <div style={{ marginLeft: 20 }}>
             <p className={'message_Background'}>{content}</p>
           </div>
         </div>)
@@ -19,7 +22,10 @@ const UiMessage: React.FC<MessageUi> = ({ id, content, isFromSender, readStatus,
           <div style={{ marginRight: 5 }}>
             <p className={'message_Background'}>{content}</p>
           </div>
-          {readStatus === 1 ? <p className={'read_status'}>{readStatus}</p> : null}
+          <div className={'messageStatus'}>
+            {readStatus === 1 ? <p className={'read_status'}>{readStatus}</p> : null}
+            <p className={'messageTime'}>{time}</p>
+          </div>
         </div>
         )
   }

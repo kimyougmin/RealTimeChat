@@ -9,6 +9,7 @@ import UiMessage from '../../components/UiMessage'
 import type MessageUi from '../../types/MessageUi'
 import { v4 } from 'uuid'
 import useInfiniteScrolling from '../../hooks/useInfiniteScrolling'
+import TimeStampUiMessageProcessing from '../../components/TimeStampUiMessageProcessing'
 
 function Chatting (): React.JSX.Element {
   const [text, setText] = useState('')
@@ -137,7 +138,7 @@ function Chatting (): React.JSX.Element {
                               content={data.content}
                               isFromSender={data.isFromSender}
                               readStatus={data.readStatus}
-                              time={data.time}
+                              time={TimeStampUiMessageProcessing(data.time)}
                               key={index}/>
           })}
           <div style={{ height: '10px', marginBottom: '20px', backgroundColor: 'red' }} ref={setObserverRef}></div>

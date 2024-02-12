@@ -13,5 +13,17 @@
 .read_status {
     display: flex;
     align-items: flex-end;
+    font-size: 11px;
+    color: #FFFF7F;
     margin-bottom: 10px;
+}
+.messageStatus {
+    display: block;
+    position: relative;
+}
+.messageStatus > .messageTime{
+    position: absolute;
+    bottom: 10px;
+    font-size: 10px;
+    color: #a0a0a0;
 }

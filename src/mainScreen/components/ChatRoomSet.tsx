@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import { type ChatRoom } from '../../types/ChatRoom'
 import ChattingRoom from '../../components/ChattingRoom'
+import TimeStampChatRoomProcessing from '../../components/TimeStampChatRoomProcessing'
 
 function ChatRoomSet (): React.JSX.Element {
   const [cookies] = useCookies(['chatUser', 'chatRoomMember', 'userData'])
@@ -68,7 +69,7 @@ function ChatRoomSet (): React.JSX.Element {
            {chatRoom.map((e, index) => {
              return <ChattingRoom key={e.roomUuid}
                                  roomUuid={e.roomUuid}
-                                 updateAt={e.updateAt}
+                                 updateAt={TimeStampChatRoomProcessing(e.updateAt)}
                                  members={e.members}
                                  lastMessage={e.lastMessage}
             />
