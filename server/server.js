@@ -66,7 +66,7 @@ app.post('/api/send', async  (req, res) => {
 app.post('/api/charRoom', async (req, res) => {
     const body = req.body;
     console.log(body)
-    pool.query(`select h.id, from_id, to_id, subject, time, (select name from user where user.id = to_id) name from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, time, (select name from user where user.id = from_id) from header h where to_id='${body.uuid}' order by time`)
+    pool.query(`select h.id, from_id, to_id, subject, update_time, (select name from user where user.id = to_id) name from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, update_time, (select name from user where user.id = from_id) from header h where to_id='${body.uuid}' order by update_time desc`)
         .then(async ([rows]) => {
             const body = await rows
             console.log(body)

@@ -2,7 +2,7 @@ import React from 'react'
 import { type ChatRoom } from '../types/ChatRoom'
 import { useCookies } from 'react-cookie'
 
-const ChattingRoom: React.FC<ChatRoom> = ({ roomUuid, createdAt, members, lastMessage }): React.JSX.Element => {
+const ChattingRoom: React.FC<ChatRoom> = ({ roomUuid, updateAt, members, lastMessage }): React.JSX.Element => {
   const [, setCookie] = useCookies(['chatUser', 'chatRoomMember', 'userData'])
   const onClickHandler = (): void => {
     setCookie('chatRoomMember', members)
@@ -15,7 +15,7 @@ const ChattingRoom: React.FC<ChatRoom> = ({ roomUuid, createdAt, members, lastMe
         <p>{lastMessage}</p>
       </div>
       <div>
-        <p>{createdAt}</p>
+        <p>{updateAt}</p>
       </div>
     </div>
   )

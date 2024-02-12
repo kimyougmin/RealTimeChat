@@ -24,7 +24,7 @@ function ChatRoomSet (): React.JSX.Element {
         }
         tempChatRoom = [...tempChatRoom, {
           roomUuid: e.id,
-          createdAt: e.time,
+          updateAt: e.update_time,
           members: {
             uuid: cookies.userData.uuid,
             name: e.name,
@@ -68,7 +68,7 @@ function ChatRoomSet (): React.JSX.Element {
            {chatRoom.map((e, index) => {
              return <ChattingRoom key={e.roomUuid}
                                  roomUuid={e.roomUuid}
-                                 createdAt={e.createdAt}
+                                 updateAt={e.updateAt}
                                  members={e.members}
                                  lastMessage={e.lastMessage}
             />

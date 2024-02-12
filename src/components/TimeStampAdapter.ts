@@ -1,4 +1,4 @@
-export default function TimeStampAdapter (timestamp: number): string {
+export default function TimeStampAdapter (timestamp): string {
   const date = new Date(timestamp)
 
   const year = date.getFullYear()
