@@ -3,13 +3,13 @@
     height: 70%;
     width: 60%;
     display: flex;
-    background-color: red;
+    background-color: #383838;
 }
 .conversationArea {
     display: block;
     height: 100%;
     width: 60%;
-    background-color: #61dafb;
+    background-color: #383838;
 }
 .conversationArea > .messagePrintArea{
     background-color: grey;
