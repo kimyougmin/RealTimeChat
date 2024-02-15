@@ -92,7 +92,15 @@ app.post('/api/selectChat', async  (req, res) => {
             console.log('안 쪽',e)
         })
 })
-
+app.post('/api/countStatus', async (req, res) => {
+    const body = req.body;
+    console.log('countStatus body',body)
+    pool.query(`select count(read_status) as countStatus from message where header_id='${body.roomUuid}' and read_status=1`)
+        .then(async ([row]) => {
+            console.log('countStatus row',row)
+            await res.send(row)
+        })
+})
 server.listen(8080, (e) => {
     console.log('server running on 8080')
 })
