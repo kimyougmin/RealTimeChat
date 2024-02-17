@@ -82,7 +82,7 @@ function Chatting (): React.JSX.Element {
   const chatUser = (): React.JSX.Element => {
     return (
       <div className={'messagePrint_Header'}>
-        <p>{cookies.chatUser.name}</p>
+        <p style={{ color: 'white', fontSize: 15 }}>{cookies.chatUser.name}</p>
       </div>
     )
   }
@@ -90,6 +90,18 @@ function Chatting (): React.JSX.Element {
   const textInputHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     setText(e.target.value)
   }
+
+  return (
+    <TextField
+      className={'textField'}
+      id="outlined-multiline-static"
+      label="Multiline"
+      multiline
+      rows={4}
+      onChange={textInputHandler}
+    />
+  )
+
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement | HTMLDivElement> = (e) => {
     if (e.key === 'Enter') {
       if (text === '' || text === '\n') {
@@ -123,9 +135,6 @@ function Chatting (): React.JSX.Element {
       }).catch(() => {
         console.log('전송 실패')
       })
-      setTimeout(() => {
-        console.log('setTimeOut')
-      }, 3000)
     }
   }
   return (
@@ -158,9 +167,9 @@ function Chatting (): React.JSX.Element {
               label="Multiline"
               multiline
               rows={4}
-              onChange={(e) => { textInputHandler(e) }}
+              onChange={textInputHandler}
               value={ text }
-              onKeyDown={(e) => { handleKeyDown(e) }}
+              onKeyDown={handleKeyDown}
             />
           </div>
         </Box>
