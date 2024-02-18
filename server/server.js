@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { pool } = require("./lib/dbconfig");
+const { pool } = require('./lib/dbconfig');
 const bodyParser = require('body-parser');
-const Timer = require("./lib/Timer");
+const Timer = require('./lib/Timer');
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -13,7 +13,7 @@ const io = new Server(server, {
     }
 });
 const { v4 } = require('uuid');
-const { header } = require("request/lib/hawk");
+const { header } = require('request/lib/hawk');
 // const connection = await  pool.getConnection(async  (conn) => conn);
 
 let msgV4 = v4()
@@ -54,7 +54,7 @@ app.post('/api/addHeader', async (req, res) => {
 app.post('/api/send', async  (req, res) => {
     const body = req.body
     pool.query(`insert into message(id, header_id, is_from_sender, content, read_status) values('${msgV4}', '${body.roomUuid}', '${body.uuid}','${body.message}', ${1})`)
-    console.log('다음 퀴리 실행',`update header set subject='${body.message}', status='${body.uuid}' where id='$body.roomUuid}'`)
+    console.log('다음 퀴리 실행',`update header set subject='${body.message}', status='${body.uuid}' where id='${body.roomUuid}'`)
     pool.query(`update header set subject='${body.message}', status='${body.uuid}' where id='${body.roomUuid}'`)
         .then(async ([rows]) => {
             await console.log('rows data => ', rows)
@@ -65,7 +65,7 @@ app.post('/api/send', async  (req, res) => {
 })
 app.post('/api/charRoom', async (req, res) => {
     const body = req.body;
-    console.log(body)
+    console.log('charRoom', body)
     pool.query(`select h.id, from_id, to_id, subject, update_time, (select name from user where user.id = to_id) name from header h where from_id='${body.uuid}' union select h.id, from_id, to_id, subject, update_time, (select name from user where user.id = from_id) from header h where to_id='${body.uuid}' order by update_time desc`)
         .then(async ([rows]) => {
             const body = await rows
@@ -94,7 +94,6 @@ app.post('/api/selectChat', async  (req, res) => {
 })
 app.post('/api/countStatus', async (req, res) => {
     const body = req.body;
-    console.log('countStatus body',body)
     pool.query(`select count(read_status) as countStatus from message where header_id='${body.roomUuid}' and read_status=1`)
         .then(async ([row]) => {
             console.log('countStatus row',row)
@@ -102,7 +101,7 @@ app.post('/api/countStatus', async (req, res) => {
         })
 })
 server.listen(8080, (e) => {
-    console.log('server running on 8080')
+    console.log('server running on 8080', e)
 })
 io.on('connection', function(socket) {
     // Listen for test and disconnect events

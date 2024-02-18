@@ -21,6 +21,7 @@ const ChattingRoom: React.FC<ChatRoom> = ({ roomUuid, updateAt, members, lastMes
   const onClickHandler = (): void => {
     setCookie('chatRoomMember', members)
     setCookie('chatUser', { roomUuid, userUuid: members.userUuid, name: members.name })
+    console.log('chatUser', { roomUuid, userUuid: members.userUuid, name: members.name })
   }
   return (
     <div className={'chattingRoom'} onClick={onClickHandler}>

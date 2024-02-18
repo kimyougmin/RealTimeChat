@@ -9,6 +9,7 @@ function ChatRoomSet (): React.JSX.Element {
   const [chatRoom, setChatRoom] = useState<ChatRoom[]>([])
   const [userUuid, setUserUuid] = useState('')
   useEffect(() => {
+    console.log('chatting room useE')
     let tempChatRoom: ChatRoom[] = []
     let tempUuid: string = ''
     fetch('http://localhost:8080/api/charRoom', {
@@ -44,12 +45,6 @@ function ChatRoomSet (): React.JSX.Element {
     if (userUuid.length !== 36) {
       return null
     }
-    chatRoom.forEach((e) => {
-      if (e.members.userUuid === userUuid) {
-        alert('이미 등록된 uuid입니다.')
-        return null
-      }
-    })
     fetch('http://localhost:8080/api/follow', {
       method: 'post',
       headers: { 'content-type': 'application/json' },

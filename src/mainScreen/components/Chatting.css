@@ -4,7 +4,7 @@
 }
 .messageBox{
     display: flex;
-    overflow: auto;
+    overflow-y: auto;
     height: 97%;
     flex-direction: column;
 }
