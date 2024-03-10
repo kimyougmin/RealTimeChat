@@ -19,7 +19,6 @@ function Chatting (): React.JSX.Element {
     selectMessage()
     onSocket()
   }, [cookies.chatUser.roomUuid])
-  console.log('mount')
   // window.addEventListener('focus', (): void | null => {
   //   console.log('window.addEventListener')
   //   if (cookies.chatUser.userUuid === undefined) {
@@ -89,6 +88,7 @@ function Chatting (): React.JSX.Element {
     }
     setText(e.target.value)
   }
+  console.log('aaa')
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement | HTMLDivElement> = (e) => {
     if (validationCheck(e)) {
