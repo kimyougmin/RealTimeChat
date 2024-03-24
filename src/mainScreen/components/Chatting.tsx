@@ -19,18 +19,40 @@ function Chatting (): React.JSX.Element {
     selectMessage()
     onSocket()
   }, [cookies.chatUser.roomUuid])
-  // window.addEventListener('focus', (): void | null => {
-  //   console.log('window.addEventListener')
-  //   if (cookies.chatUser.userUuid === undefined) {
-  //     return null
-  //   }
-  //   fetch('http://localhost:8080/api/readMessage', {
-  //     method: 'post',
-  //     headers: { 'content-type': 'application/json' },
-  //     body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
-  //   }).then(() => { selectMessage() })
-  //     .catch((e) => { alert(e) })
-  // })
+  const readValidation = (): null | void => {
+    if (cookies.chatUser.userUuid === undefined) {
+      return null
+    }
+    if (message[message.length - 1] === undefined) {
+      return null
+    }
+    if (message[message.length - 1].readStatus === 0) {
+      return null
+    }
+  }
+  useEffect(() => {
+    readValidation()
+    window.addEventListener('focus', (): void | null => {
+      console.log('window.addEventListener')
+      fetch('http://localhost:8080/api/readMessage', {
+        method: 'post',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ roomUuid: cookies.chatUser.roomUuid })
+      }).then(() => {
+        const data: MessageUi[] = message.map((e) => {
+          return {
+            id: e.id,
+            time: e.time,
+            content: e.content,
+            isFromSender: e.isFromSender,
+            readStatus: 0
+          }
+        })
+        setMessage(data)
+      })
+        .catch((e) => { alert(e) })
+    })
+  }, [message])
 
   const selectMessage = (): void => {
     fetch('http://localhost:8080/api/selectChat', {
@@ -88,7 +110,6 @@ function Chatting (): React.JSX.Element {
     }
     setText(e.target.value)
   }
-  console.log('aaa')
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement | HTMLDivElement> = (e) => {
     if (validationCheck(e)) {
