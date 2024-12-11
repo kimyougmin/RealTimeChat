@@ -1,9 +1,9 @@
 const mysql = require('mysql2/promise');
 const pool = mysql.createPool({
-    host: '211.197.178.97',
+    host: '127.0.0.1',
     port: '40040',
-    user: 'kym',
-    password: 'azsx2033!',
+    user: 'user',
+    password: 'useruser',
     database: 'RealTimeChat',
     connectTimeout: 10000,
     connectionLimit: 30
